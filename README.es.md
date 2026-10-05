@@ -134,8 +134,9 @@ python search.py --bench
 
 ## Limitaciones / hoja de ruta
 
-- La cabeza `value` sigue siendo débil; el checkpoint incluido tiene pocas
-  iteraciones de autojuego. Entrenar más mejora directamente el MCTS.
+- La cabeza `value` sigue siendo débil; el checkpoint publicado viene de **una
+  sola iteración** de autojuego (10 partidas, 100 sims MCTS, ~53 min en CPU).
+  Entrenar más mejora directamente el MCTS.
 - Stockfish a fuerza completa gana con claridad: el hueco está medido y es
   honesto.
 - Rendimiento en Python: ~29 kNPS de alfa-beta, ~115 sims/s de MCTS. Portar

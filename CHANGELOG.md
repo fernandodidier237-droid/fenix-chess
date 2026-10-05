@@ -5,7 +5,7 @@ Historial de iteraciones del motor, en orden real de desarrollo.
 ## 1.0 — Motor original (estado inicial)
 
 - `alpha_zero_engine.py` UCI + MCTS puro sobre la red neuronal entrenada
-  (7 iteraciones × 40 partidas de autojuego/self-play, 100 sims).
+  (1 iteración × 10 partidas de autojuego/self-play, 100 sims, 52 min en CPU).
 - Diagnóstico al medirlo:
   - **0 victorias, 0 empates, 4 derrotas vs Stockfish (UCI_Elo 1350)**.
   - Value head inservible: devuelve ≈0 con una dama de más (`+0.0` en vez de
@@ -165,7 +165,9 @@ Además ambas entradas comparten md5 (mismo fichero), así que «recordar el
 
 ## Pendiente / conocido
 
-- La red sigue siendo débil (solo 7 iteraciones de self-play): el modo
-  `MCTS` puro juega
+- La red sigue muy poco entrenada: el checkpoint publicado viene de **una sola
+  iteración con 10 partidas** de self-play (log del 30/06/2026 17:59, 3160 s).
+  Las corridas posteriores de 5×20 y 7×40 partidas mueren al instante (logs de
+  1 s) y nunca produjeron pesos. El modo `MCTS` puro juega
   peor que el híbrido. Entrenar más iteraciones mejoraría los priors.
 - A fuerza completa, Stockfish 16 sigue siendo superior (ver tabla).

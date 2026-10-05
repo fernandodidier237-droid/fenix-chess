@@ -144,8 +144,9 @@ python search.py --bench
 
 ## Known limitations / roadmap
 
-- The value head is still weak; the shipped checkpoint has only a few
-  self-play iterations behind it. More training directly improves MCTS.
+- The value head is still weak; the shipped checkpoint comes from **a single
+  self-play iteration** (10 games, 100 MCTS sims, ~53 min on CPU). More
+  training directly improves MCTS.
 - Full-strength Stockfish wins — comfortably. The gap is honest and measured.
 - Python throughput: ~29 kNPS alpha-beta, ~115 sims/s MCTS. Porting the hot
   paths to a compiled extension is the obvious next step.
