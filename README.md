@@ -1,74 +1,110 @@
-# AlphaZero Chess — self-play from scratch
+# AlphaZero Chess — autojuego desde cero
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-orange)
-![UCI](https://img.shields.io/badge/UCI-engine-green)
+![UCI](https://img.shields.io/badge/motor-UCI-green)
 
-> Train an AlphaZero-style chess engine **from zero** (Monte-Carlo Tree Search
-> + neural network, pure self-play) and play it in any UCI GUI — this repo
-> ships a working **PyChess** integration and honest, measured results.
+> Entrena un motor de ajedrez estilo AlphaZero **desde cero** (Monte-Carlo
+> Tree Search + red neuronal, solo partidas contra sí mismo) y juega con él
+> desde cualquier GUI UCI — este repo incluye la integración con **PyChess**
+> y resultados medidos y honestos.
 
-**English** | [Español](README.es.md)
+**Español** | [English](README.en.md)
 
-![AlphaZero (Hybrid) checkmating Stockfish 16 limited to 1350 Elo](docs/demo.gif)
+![AlphaZero (Hybrid) da mate a Stockfish 16 limitado a 1350 Elo](docs/demo.gif)
 
-*Real game recorded by `play_match.py`: AlphaZero (Hybrid, 1 s/move) vs
-Stockfish 16 at `UCI_Elo 1350` — checkmate in 65 moves, no editing.*
+*Partida real registrada por `play_match.py`: AlphaZero (Hybrid, 1 s/jugada)
+contra Stockfish 16 con `UCI_Elo 1350` — mate en 65 jugadas, sin editar.*
 
-## TL;DR
+## Resumen
 
 ```bash
 pip install -r requirements.txt
-python main.py --iterations 10 --self-play-games 40   # train (CPU-friendly)
-python search.py --bench                             # alpha-beta bench: depth 7 / 2 s
-python play_match.py --games 4 --elo 1350            # match vs Stockfish
+python main.py --iterations 10 --self-play-games 40   # entrenar (vale CPU)
+python search.py --bench                             # bench alfa-beta: profundidad 7 / 2 s
+python play_match.py --games 4 --elo 1350            # partido vs Stockfish
 ```
 
-Then point any UCI GUI at `alpha_zero_engine.py` and play.
+Después apunta cualquier GUI UCI a `alpha_zero_engine.py` y juega.
 
-## What's inside
+## Qué hay dentro
 
-- **`self_play.py` / `mcts.py` / `neural_network.py`** — the AlphaZero loop:
-  MCTS guided by a policy+value ResNet, self-play games, replay buffer,
-  arena evaluation, checkpointing. No external AlphaZero code.
-- **`search.py`** — the twist: a classical **alpha-beta searcher** (negamax,
-  quiescence, transposition table, tapered PeSTO eval with king-shelter terms, iterative deepening,
-  killers/history/LMR/futility) that takes the network's priors as root
-  probabilities. This *hybrid* is much stronger than the raw MCTS with the
-  current (small) training budget.
-- **`alpha_zero_engine.py`** — a real **UCI engine** with two selectable
-  search modes, time management, `stop`, `info`/`pv` output and a background
-  search thread. Option `SearchType = Hybrid | MCTS`.
-- **`play_match.py`** — UCI-vs-UCI match runner (Elo gates or full strength).
-- **`verify_pychess_integration.py`** — headless test using the *real*
-  PyChess code: discovery, option handshake and a move from both entries.
+- **`self_play.py` / `mcts.py` / `neural_network.py`** — el ciclo AlphaZero:
+  MCTS guiado por una red ResNet policy+value, partidas de autojuego, buffer
+  de replay, evaluación en arena y checkpoints. Sin código de AlphaZero ajeno.
+- **`search.py`** — la apuesta: un buscador **alfa-beta clásico** (negamax,
+  quiescencia, tabla de transposición, evaluación tapered PeSTO con refugio del rey, iterative
+  deepening, killers/history/LMR/futility) que recibe los priors de la red
+  como probabilidades en la raíz. Este modo *híbrido* es mucho más fuerte
+  que el MCTS puro con el presupuesto de entrenamiento actual.
+- **`alpha_zero_engine.py`** — un motor **UCI** de verdad, con dos modos de
+  búsqueda seleccionables, gestión de tiempo, `stop` real y salida
+  `info`/`pv`. Opción `SearchType = Hybrid | MCTS`.
+- **`play_match.py`** — runner de partidas UCI (puertas de Elo o fuerza
+  completa).
+- **`verify_pychess_integration.py`** — test headless con el **código real
+  de PyChess**: descubrimiento, handshake de opciones y una jugada desde
+  cada entrada.
 
-## Measured results
+## Resultados medidos
 
-Everything below was produced by `play_match.py` (1 s/move for us,
-200 ms/move for Stockfish unless noted). No cherry-picking — the failures
-stay in the table.
+Todo salió de `play_match.py` (1 s/jugada para nosotros, 200 ms/jugada para
+Stockfish salvo indicación). Sin trucos: las derrotas están en la tabla.
 
-| Stockfish 16 opponent | Before (v1.0) | Now (v1.6) |
+| Rival (Stockfish 16) | Antes (v1.0) | Ahora (v1.5) |
 |---|---|---|
-| `UCI_Elo 1350` | 0W – 0D – 4L | **6W – 0D – 0L** |
-| `UCI_Elo 1600` | — | **3W – 1D – 0L** (+2/4) |
-| `UCI_Elo 1800` | — | 0W – 1D – 3L (−3/4) |
-| Full strength (0.5 s) | — | 0W – 0D – 1L (expected) |
+| `UCI_Elo 1350` | 0V – 0E – 4D | **6V – 0E – 0D** |
+| `UCI_Elo 1600` | — | **3V – 1E – 0D** (+2/4) |
+| `UCI_Elo 1800` | — | 0V – 1E – 3D (−3/4) |
+| Fuerza completa (0.5 s) | — | 0V – 0E – 1D (esperado) |
 
-Alpha-beta bench: **depth 7 in 2 s (~27 kNPS)**, **6/6** tactics puzzles.
+Bench alfa-beta: **profundidad 7 en 2 s (~27 kNPS)**, **6/6** tácticas.
 
-v1.6 re-measured on the same settings: `UCI_Elo 1350` → 4W–0D–0L and
-`UCI_Elo 1600` → 3W–1D–0L — the same strength band. The king-shelter eval
-term cuts the node count 9 %; `CHANGELOG.md` carries the ablation that also
-shows null-move pruning and PV-move ordering *hurt* at this scale.
+La v1.6 vuelve a medirse igual: `UCI_Elo 1350` → 4V–0E–0D y
+`UCI_Elo 1600` → 3V–1E–0D — mismo tramo de fuerza (el término de refugio del
+rey baja los nodos un 9 % sin cambiar el resultado). En `CHANGELOG.md` está
+la ablación que además demuestra que el *null-move pruning* y la ordenación
+por jugada PV **empeoran** a esta escala.
 
-Estimated playing strength: **≈1650–1750 Elo**. At full strength Stockfish 16
-is still far stronger — an honest limitation, not a hidden one: this is a
-Python engine with a network trained on a laptop CPU.
+## Comparativa entre versiones
 
-## Install
+Todo medido con el mismo script y hardware; los partidos son cortos (4–6 por
+nivel), así que léelos como tendencia, no como Elo exacto.
+
+| Métrica | v1.0 (original) | v1.5 | v1.6 (actual) |
+|---|---|---|---|
+| vs Stockfish `UCI_Elo 1350` | 0V – 0E – 4D | **6V – 0E – 0D** | **4V – 0E – 0D** |
+| vs Stockfish `UCI_Elo 1600` | — | 3V – 1E – 0D (+2/4) | 3V – 1E – 0D (+2/4) |
+| vs Stockfish `UCI_Elo 1800` | — | 0V – 1E – 3D (−3/4) | sin medir |
+| vs Stockfish fuerza completa | — | 0V – 0E – 1D | sin medir |
+| Búsqueda | MCTS puro, 114 sims/s | alfa-beta híbrido | alfa-beta híbrido |
+| Bench 2 s | sin bench | depth 7 / 5, ~29 kNPS | depth 7 / 5, ~27 kNPS |
+| Nodos a depth 7 (4 posiciones) | — | 263.479 | **239.527 (−9,1 %)** |
+| Motor UCI con `stop` real | no | sí | sí |
+| Integración con GUI | ninguna | PyChess (2 entradas) | PyChess (2 entradas) |
+| Fuerza estimada | ≤1300 (perdía 0–4 a 1350) | ≈1650–1750 | ≈1650–1750 |
+
+## Por qué es 1.6 y no 2.0
+
+1. **Lo único medible que mejoró fue el coste, no la fuerza**: −9,1 % de
+   nodos; en fuerza el resultado cae dentro del ruido de 4 partidas
+   (mismo tramo, ≈1650–1750 Elo). Un 2.0 debe traer un salto demostrable.
+2. **Compatibilidad**: la v1.6 solo *añade* un término a la evaluación
+   (19 líneas). No cambia opciones UCI, ni el formato del motor, ni la
+   configuración de PyChess → por semver es una minor.
+3. **Los refuerzos "grandes" no se sostienen**: null-move pruning y
+   ordenación PV se implementaron, se midieron y **empeoraron** (+36,7 % y
+   +74,2 % de nodos). No hay salto cualitativo que justifique un 2.0.
+4. **Lo que sí convertiría esto en un 2.0**: ganarle a Stockfish 1800 o a
+   fuerza completa con margen, un entrenamiento largo que dé un MCTS
+   competitivo, o un cambio de arquitectura (GPU / red mayor / API nueva).
+
+Fuerza estimada: **≈1650–1750 Elo**. A fuerza completa Stockfish 16 sigue
+siendo muy superior: es una limitación honesta y medida (motor en Python con
+una red entrenada en portátil).
+
+## Instalación
 
 ```bash
 python3 -m venv .venv
@@ -76,57 +112,45 @@ source .venv/bin/activate
 pip install -r requirements.txt      # torch, python-chess, numpy, tensorboard
 ```
 
-Optional, for the GUI/tests: a system PyChess (`apt install pychess`) and
-Stockfish (`apt install stockfish`). Neither is bundled — both are GPL
-programs you install yourself.
+Opcional, para la GUI y los tests: PyChess del sistema (`apt install pychess`)
+y Stockfish (`apt install stockfish`). Ninguno va empaquetado: son programas
+GPL que instalas tú.
 
-## Train
+## Entrenar
 
 ```bash
 python main.py --iterations 20 --self-play-games 40 --mcts-sims 100
 tensorboard --logdir logs
 ```
 
-`config.py` holds the paper-scale defaults (100 iterations × 10 000 games);
-start small on CPU. Checkpoints land in `models/` (weights are **not**
-committed — see `.gitignore`).
+`config.py` trae los valores por defecto tipo artículo (100 iteraciones ×
+10 000 partidas); empieza pequeño en CPU. Los checkpoints van a `models/`
+(los pesos **no** se suben — ver `.gitignore`).
 
-## Play it
+## Jugar
 
-**Any UCI GUI** (Arena, CuteChess, PyChess…) → add a new engine →
-command:
+**Cualquier GUI UCI** (Arena, CuteChess, PyChess…) → añadir motor → comando:
 
 ```bash
-python /path/to/alpha_zero_engine.py
+python /ruta/a/alpha_zero_engine.py
 ```
 
-> The committed shebang points at the original author's venv; edit the first
-> line of `alpha_zero_engine.py` or launch it through your own `python`.
+> El shebang del repo apunta a la venv del autor original; edita la primera
+> línea de `alpha_zero_engine.py` o lánzalo con tu propio `python`.
 
-Useful UCI options: `SearchType` (Hybrid|MCTS), `UseNN`, `MCTS_Simulations`,
-`Hash`.
+Opciones UCI útiles: `SearchType` (Hybrid|MCTS), `UseNN`,
+`MCTS_Simulations`, `Hash`.
 
-**PyChess** registers it in `~/.config/pychess/engines.json`:
+**PyChess** lo registra en `~/.config/pychess/engines.json` (entrada
+`AlphaZeroChess`, protocolo `uci`, `level` 20, `recheck` true). Este repo
+incluye **dos** entradas para elegir el modo en el diálogo de nueva partida:
+`AlphaZeroChess` (Hybrid) y `AlphaZeroChess-MCTS` (MCTS puro). Las opciones
+se editan en *Herramientas → Motores* y el `value` guardado se aplica al
+arrancar el motor. Si tocas el binario del motor, vuelve a ejecutar
+`python verify_pychess_integration.py`: el cambio de checksum hace que
+PyChess redescubra el motor y pierda los `value` guardados.
 
-```json
-{
-  "name": "AlphaZeroChess",
-  "command": "/path/to/alpha_zero_engine.py",
-  "protocol": "uci",
-  "level": 20,
-  "analyze": true,
-  "recheck": true
-}
-```
-
-This repo ships **two** entries so you can pick the mode right in the
-New Game dialog: `AlphaZeroChess` (Hybrid) and `AlphaZeroChess-MCTS`
-(MCTS puro). Options are editable under *Tools → Engines*; a saved
-`value` is applied at engine start. Re-run
-`python verify_pychess_integration.py` after touching the engine binary —
-a checksum change makes PyChess re-discover and drop saved option values.
-
-**Command line:**
+**Por línea de comandos:**
 
 ```bash
 python play_match.py --games 4 --elo 1600 --engine Hybrid
@@ -134,29 +158,30 @@ python play_match.py --games 1 --full-strength --sf-time-ms 500
 python search.py --bench
 ```
 
-## Repository layout
+## Estructura del repo
 
-| Path | What it is |
+| Ruta | Qué es |
 |---|---|
-| `main.py` / `coach.py` | training loop (self-play → buffer → train → arena) |
-| `chess_env.py` / `neural_network.py` | environment wrapper + ResNet (policy & value) |
-| `mcts.py` / `self_play.py` | MCTS with NN priors + self-play generation |
-| `search.py` | hybrid alpha-beta searcher (the strong one) |
-| `alpha_zero_engine.py` | UCI engine front-end (Hybrid / MCTS) |
-| `play_match.py` | UCI match runner with Elo gating |
-| `verify_pychess_integration.py` | headless PyChess integration test |
-| `CHANGELOG.md` | version history 1.0 → 1.5 with every fix, in Spanish |
+| `main.py` / `coach.py` | bucle de entrenamiento (autojuego → buffer → train → arena) |
+| `chess_env.py` / `neural_network.py` | entorno + ResNet (policy y value) |
+| `mcts.py` / `self_play.py` | MCTS con priors de la red + generación de partidas |
+| `search.py` | buscador híbrido alfa-beta (el fuerte) |
+| `alpha_zero_engine.py` | front-end UCI (Hybrid / MCTS) |
+| `play_match.py` | runner de partidas UCI con puertas de Elo |
+| `verify_pychess_integration.py` | test de integración con PyChess |
+| `CHANGELOG.md` / `CHANGELOG.en.md` | historial de versiones 1.0 → 1.6 con cada corrección (español / inglés) |
 
-## Known limitations / roadmap
+## Limitaciones / hoja de ruta
 
-- The value head is still weak; the shipped checkpoint comes from **a single
-  self-play iteration** (10 games, 100 MCTS sims, ~53 min on CPU). More
-  training directly improves MCTS.
-- Full-strength Stockfish wins — comfortably. The gap is honest and measured.
-- Python throughput: ~29 kNPS alpha-beta, ~115 sims/s MCTS. Porting the hot
-  paths to a compiled extension is the obvious next step.
+- La cabeza `value` sigue siendo débil; el checkpoint publicado viene de **una
+  sola iteración** de autojuego (10 partidas, 100 sims MCTS, ~53 min en CPU).
+  Entrenar más mejora directamente el MCTS.
+- Stockfish a fuerza completa gana con claridad: el hueco está medido y es
+  honesto.
+- Rendimiento en Python: ~29 kNPS de alfa-beta, ~115 sims/s de MCTS. Portar
+  los caminos calientes a una extensión compilada es el paso obvio.
 
-## License
+## Licencia
 
-[MIT](LICENSE). Stockfish and PyChess are separate GPL programs and are not
-redistributed here.
+[MIT](LICENSE). Stockfish y PyChess son programas GPL independientes y aquí
+no se redistribuyen.

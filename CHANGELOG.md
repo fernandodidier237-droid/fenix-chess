@@ -1,6 +1,7 @@
 # Changelog — AlphaZero Chess
 
 Historial de iteraciones del motor, en orden real de desarrollo.
+Versión en español · [English](CHANGELOG.en.md)
 
 ## 1.0 — Motor original (estado inicial)
 
@@ -196,11 +197,35 @@ Mediciones de esta iteración:
 - Integración PyChess: `verify_pychess_integration.py` → **exit 0**
   (Hybrid + MCTS).
 
+Comparativa con las versiones anteriores (mismo script y hardware):
+
+| Métrica | v1.0 | v1.5 | v1.6 |
+|---|---|---|---|
+| vs SF `UCI_Elo 1350` | 0V – 0E – 4D | 6V – 0E – 0D | **4V – 0E – 0D** |
+| vs SF `UCI_Elo 1600` | — | 3V – 1E – 0D | **3V – 1E – 0D** |
+| vs SF `UCI_Elo 1800` | — | 0V – 1E – 3D | sin medir |
+| vs SF fuerza completa | — | 0V – 0E – 1D | sin medir |
+| Búsqueda | MCTS puro (114 sims/s) | alfa-beta híbrido | alfa-beta híbrido |
+| Nodos a depth 7 (4 pos) | — | 263.479 | **239.527 (−9,1 %)** |
+| Fuerza estimada | ≤1300 | ≈1650–1750 | ≈1650–1750 |
+
 **Lectura honesta:** la ganancia de fuerza está dentro del ruido de 4
 partidas; el motor sigue en el mismo tramo (≈1650–1750). Por eso la versión
 es **1.6** y no 2.0. Lo que sí es una mejora reproducible es el coste de
 nodos (−9 %) y, sobre todo, el dato: a esta escala las podas clásicas
 grandes **no** pagan.
+
+**Por qué no es 2.0 (criterio explícito):**
+
+1. La única mejora medible es de coste de nodos, no de fuerza → no hay salto
+   demostrable que justifique un cambio mayor de versión.
+2. Es compatible hacia atrás: solo añade un término de evaluación (19
+   líneas); no cambian opciones UCI, ni formato del motor, ni la
+   configuración de PyChess → minor según semver.
+3. Los refuerzos grandes (null-move, orden PV) se midieron y empeoraron.
+4. Habría un 2.0 real si: gana a Stockfish 1800/fuerza completa con margen,
+   o un entrenamiento largo hace competitivo el MCTS, o cambia la
+   arquitectura (GPU, red mayor, API nueva).
 
 ## Pendiente / conocido
 
