@@ -1,0 +1,32 @@
+# ── Entorno virtual (4.8 GB, cada quien lo recrea con requirements.txt) ──
+.venv/
+venv/
+env/
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ── Pesos de la red / checkpoints (entrenar con: python main.py) ──
+models/
+*.pt
+*.pth
+
+# ── Datos de entrenamiento, logs y tensorboard ──
+data/
+logs/
+tensorboard/
+runs/
+
+# ── Configuración local de PyChess (backups de engines.json) ──
+*.bak
+*.bak-*
+engines.json.bak-*
+
+# ── Sistema / editores ──
+.DS_Store
+*.swp
+*~
