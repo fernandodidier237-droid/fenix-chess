@@ -34,7 +34,7 @@ Después apunta cualquier GUI UCI a `alpha_zero_engine.py` y juega.
   MCTS guiado por una red ResNet policy+value, partidas de autojuego, buffer
   de replay, evaluación en arena y checkpoints. Sin código de AlphaZero ajeno.
 - **`search.py`** — la apuesta: un buscador **alfa-beta clásico** (negamax,
-  quiescencia, tabla de transposición, evaluación tapered PeSTO, iterative
+  quiescencia, tabla de transposición, evaluación tapered PeSTO con refugio del rey, iterative
   deepening, killers/history/LMR/futility) que recibe los priors de la red
   como probabilidades en la raíz. Este modo *híbrido* es mucho más fuerte
   que el MCTS puro con el presupuesto de entrenamiento actual.
@@ -59,7 +59,13 @@ Stockfish salvo indicación). Sin trucos: las derrotas están en la tabla.
 | `UCI_Elo 1800` | — | 0V – 1E – 3D (−3/4) |
 | Fuerza completa (0.5 s) | — | 0V – 0E – 1D (esperado) |
 
-Bench alfa-beta: **profundidad 7 en 2 s (~29 kNPS)**, **6/6** tácticas.
+Bench alfa-beta: **profundidad 7 en 2 s (~27 kNPS)**, **6/6** tácticas.
+
+La v1.6 vuelve a medirse igual: `UCI_Elo 1350` → 4V–0E–0D y
+`UCI_Elo 1600` → 3V–1E–0D — mismo tramo de fuerza (el término de refugio del
+rey baja los nodos un 9 % sin cambiar el resultado). En `CHANGELOG.md` está
+la ablación que además demuestra que el *null-move pruning* y la ordenación
+por jugada PV **empeoran** a esta escala.
 
 Fuerza estimada: **≈1650–1750 Elo**. A fuerza completa Stockfish 16 sigue
 siendo muy superior: es una limitación honesta y medida (motor en Python con

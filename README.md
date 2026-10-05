@@ -33,7 +33,7 @@ Then point any UCI GUI at `alpha_zero_engine.py` and play.
   MCTS guided by a policy+value ResNet, self-play games, replay buffer,
   arena evaluation, checkpointing. No external AlphaZero code.
 - **`search.py`** — the twist: a classical **alpha-beta searcher** (negamax,
-  quiescence, transposition table, tapered PeSTO eval, iterative deepening,
+  quiescence, transposition table, tapered PeSTO eval with king-shelter terms, iterative deepening,
   killers/history/LMR/futility) that takes the network's priors as root
   probabilities. This *hybrid* is much stronger than the raw MCTS with the
   current (small) training budget.
@@ -50,14 +50,19 @@ Everything below was produced by `play_match.py` (1 s/move for us,
 200 ms/move for Stockfish unless noted). No cherry-picking — the failures
 stay in the table.
 
-| Stockfish 16 opponent | Before (v1.0) | Now (v1.5) |
+| Stockfish 16 opponent | Before (v1.0) | Now (v1.6) |
 |---|---|---|
 | `UCI_Elo 1350` | 0W – 0D – 4L | **6W – 0D – 0L** |
 | `UCI_Elo 1600` | — | **3W – 1D – 0L** (+2/4) |
 | `UCI_Elo 1800` | — | 0W – 1D – 3L (−3/4) |
 | Full strength (0.5 s) | — | 0W – 0D – 1L (expected) |
 
-Alpha-beta bench: **depth 7 in 2 s (~29 kNPS)**, **6/6** tactics puzzles.
+Alpha-beta bench: **depth 7 in 2 s (~27 kNPS)**, **6/6** tactics puzzles.
+
+v1.6 re-measured on the same settings: `UCI_Elo 1350` → 4W–0D–0L and
+`UCI_Elo 1600` → 3W–1D–0L — the same strength band. The king-shelter eval
+term cuts the node count 9 %; `CHANGELOG.md` carries the ablation that also
+shows null-move pruning and PV-move ordering *hurt* at this scale.
 
 Estimated playing strength: **≈1650–1750 Elo**. At full strength Stockfish 16
 is still far stronger — an honest limitation, not a hidden one: this is a

@@ -141,6 +141,9 @@ ROOK_SEMI_OPEN = 11
 DOUBLED_PAWN = -12
 ISOLATED_PAWN = -14
 TEMPO_BONUS = 12
+# refugio del rey: peón propio en su columna / columnas laterales
+KING_SHELTER = 9
+KING_SHELTER_SIDE = 13
 
 
 # ── Evaluación ──────────────────────────────────────────────────────────
@@ -230,6 +233,22 @@ def evaluate(board: chess.Board) -> int:
                 bonus = PASSED_PAWN_BONUS[rel_rank]
                 mg_extra += bonus
                 eg_extra += bonus * 2
+
+        # refugio del rey: peones propios delante, en su columna o laterales
+        king_sq = board.king(color)
+        if king_sq is not None:
+            kf = chess.square_file(king_sq)
+            kr = chess.square_rank(king_sq)
+            for sq in own_pawns:
+                pf = chess.square_file(sq)
+                pr = chess.square_rank(sq)
+                ahead = pr > kr if color == chess.WHITE else pr < kr
+                if not ahead or abs(pr - kr) > 2:
+                    continue
+                if pf == kf:
+                    mg_extra += KING_SHELTER
+                elif abs(pf - kf) == 1:
+                    mg_extra += KING_SHELTER_SIDE
 
         if color == chess.WHITE:
             mg_w += mg_extra

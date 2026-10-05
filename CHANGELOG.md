@@ -163,6 +163,45 @@ Herramientas → Motores, o re-ejecutar `verify_pychess_integration.py`).
 Además ambas entradas comparten md5 (mismo fichero), así que «recordar el
 último motor» puede precargar `AlphaZeroChess` en lugar de la variante MCTS.
 
+## 1.6 — Evaluación: refugio del rey (y dos klasikuer descartados)
+
+- **Añadido** en `search.py::evaluate`: término de **refugio del rey** —
+  +9 cp por peón propio en la columna del rey, +13 cp en las columnas
+  laterales, contando sólo peones hasta 2 filas por delante (`KING_SHELTER`,
+  `KING_SHELTER_SIDE`). Diff mínimo: +19 líneas, sin tocar la búsqueda.
+- **Probado y DESCARTADO** (con medición, no con opinión): *null-move
+  pruning* con verificación y *ordenación de la jugada PV por delante del TT
+  move*. Los dos **empeoran** a esta escala (ventana estrecha, profundidad
+  ~7). No entran en el código.
+
+Ablación (nodos a profundidad fija 7, 4 posiciones: startpos, kiwipete,
+pos3, pos4; mismo hardware, sin reloj):
+
+| variante | nodos | vs base |
+|---|---:|---:|
+| base (v1.5) | 263.479 | 0,0 % |
+| **+ refugio del rey (lo que se queda)** | **239.527** | **−9,1 %** |
+| + null-move (con verificación) | 360.068 | +36,7 % |
+| + orden PV sobre TT move | 458.900 | +74,2 % |
+| refugio + null-move | 328.903 | +24,8 % |
+| los tres juntos | 533.297 | +102,4 % |
+
+Mediciones de esta iteración:
+
+- Bench: **depth 7 (startpos) / 5 (kiwipete) en 2 s**, ~27 kNPS, **6/6
+  tácticas** (sin cambios).
+- Partidas (AZ 1 s/jugada, Stockfish 200 ms):
+  - `UCI_Elo 1350` → **4V – 0E – 0D**
+  - `UCI_Elo 1600` → **3V – 1E – 0D** (+2,0/4)
+- Integración PyChess: `verify_pychess_integration.py` → **exit 0**
+  (Hybrid + MCTS).
+
+**Lectura honesta:** la ganancia de fuerza está dentro del ruido de 4
+partidas; el motor sigue en el mismo tramo (≈1650–1750). Por eso la versión
+es **1.6** y no 2.0. Lo que sí es una mejora reproducible es el coste de
+nodos (−9 %) y, sobre todo, el dato: a esta escala las podas clásicas
+grandes **no** pagan.
+
 ## Pendiente / conocido
 
 - La red sigue muy poco entrenada: el checkpoint publicado viene de **una sola
