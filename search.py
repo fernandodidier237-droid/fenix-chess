@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-search.py — Búsqueda clásica híbrida para AlphaZero Chess.
+search.py — Búsqueda clásica híbrida para Fénix Chess.
 ==========================================================
 
 Alfa-beta negamax + quiescencia con:
@@ -314,6 +314,13 @@ class Searcher:
 
     # ── utilidades ──
 
+    @staticmethod
+    def _can_null_move(board: chess.Board) -> bool:
+        for pt in (chess.KNIGHT, chess.BISHOP, chess.ROOK, chess.QUEEN):
+            if board.pieces(pt, board.turn):
+                return True
+        return False
+
     def _check_time(self) -> None:
         self.nodes += 1
         if self.nodes & 1023 == 0:
@@ -519,6 +526,18 @@ class Searcher:
                     and abs(beta) < MATE_BOUND:
                 return static_eval
 
+            # null-move (a partir de profundidad 5, con verificación)
+            if (not is_root and depth >= 5 and abs(beta) < MATE_BOUND
+                    and self._can_null_move(board)):
+                board.push(chess.Move.null())
+                null_score = -self._negamax(
+                    board, depth - 3, -beta, -beta + 1, ply + 1)
+                board.pop()
+                if null_score >= beta:
+                    verify = self._negamax(board, depth - 1, alpha, beta, ply)
+                    if verify >= beta:
+                        return verify
+
         moves = list(board.legal_moves)
         if not moves:
             return -MATE_SCORE + ply if in_check else 0
@@ -547,10 +566,10 @@ class Searcher:
 
             # ── LMR ──
             reduction = 0
-            if (i >= 4 and depth >= 3 and is_quiet and not in_check
+            if (i >= 3 and depth >= 3 and is_quiet and not in_check
                     and not new_check and not is_root):
                 reduction = 1
-                if i >= 8 and depth >= 4:
+                if i >= 6 and depth >= 4:
                     reduction = 2
 
             if i == 0:

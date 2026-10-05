@@ -1,5 +1,5 @@
 """
-Chess environment for AlphaZero.
+Chess environment for Fénix Chess.
 
 Provides:
   - encode_board()        → 8×8×119 tensor of the current position

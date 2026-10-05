@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════════════════╗
-║     AlphaZero Chess vs Stockfish — Match UCI (v2)                        ║
+║     Fénix Chess vs Stockfish — Match UCI (v2)                        ║
 ║                                                                          ║
 ║  Juega nuestro motor UCI (alpha_zero_engine.py, el mismo que usa         ║
 ║  PyChess) contra Stockfish, alternando colores.                           ║
@@ -57,7 +57,7 @@ def play_game(az, sf, args, az_white: bool, game_num: int, total_games):
     board = chess.Board()
     moves = []
     t_start = time.time()
-    name_az = f"AlphaZero[{args.engine}] ({args.az_time:.1f}s/ jugada)"
+    name_az = f"Fénix[{args.engine}] ({args.az_time:.1f}s/ jugada)"
     name_sf = ("Stockfish (fuerza total)" if args.full_strength
                else f"Stockfish (UCI_Elo {args.elo})")
     white_name = name_az if az_white else name_sf
@@ -100,7 +100,7 @@ def play_game(az, sf, args, az_white: bool, game_num: int, total_games):
         white_won = outcome.winner == chess.WHITE
         az_won = white_won == az_white
         result_val = 1.0 if az_won else -1.0
-        desc = "¡AlphaZero gana!" if az_won else "Stockfish gana"
+        desc = "¡Fénix gana!" if az_won else "Stockfish gana"
     term = outcome.termination.name if outcome else "-"
     print(f"  Resultado: {desc} ({term}) en {len(moves)} jugadas "
           f"({elapsed:.0f}s)", flush=True)
@@ -110,7 +110,7 @@ def play_game(az, sf, args, az_white: bool, game_num: int, total_games):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Partido UCI: AlphaZero vs Stockfish",
+        description="Partido UCI: Fénix vs Stockfish",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--games", type=int, default=6,
@@ -123,12 +123,12 @@ def main():
                         default="Hybrid",
                         help="Tipo de búsqueda de nuestro motor")
     parser.add_argument("--az-time", type=float, default=1.0,
-                        help="Segundos por jugada para AlphaZero")
+                        help="Segundos por jugada para Fénix")
     parser.add_argument("--sf-time-ms", type=float, default=200,
                         help="Milisegundos por jugada para Stockfish")
     args = parser.parse_args()
 
-    print(f"Motor: AlphaZero[{args.engine}]  {args.az_time}s/jugada | "
+    print(f"Motor: Fénix[{args.engine}]  {args.az_time}s/jugada | "
           f"Stockfish: "
           f"{'fuerza total' if args.full_strength else f'UCI_Elo {args.elo}'}"
           f"  {args.sf_time_ms:.0f}ms/jugada", flush=True)
@@ -155,7 +155,7 @@ def main():
     sf_wins = sum(1 for x in scores if x < 0)
     draws = sum(1 for x in scores if x == 0)
     print(f"\n{'='*64}\n  MARCADOR FINAL", flush=True)
-    print(f"  AlphaZero: {az_wins} victorias, {sf_wins} derrotas, "
+    print(f"  Fénix: {az_wins} victorias, {sf_wins} derrotas, "
           f"{draws} tablas", flush=True)
     print(f"  Puntos: {sum(scores):+.1f} / {len(scores)}", flush=True)
     print(f"{'='*64}", flush=True)

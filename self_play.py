@@ -1,5 +1,5 @@
 """
-Self-play game generation for AlphaZero.
+Self-play game generation for Fénix Chess.
 
 Each self-play game is played entirely by MCTS guided by the current neural
 network. Training examples (state, policy_target, result) are collected from

@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════════════════╗
-║              AlphaZero Chess — Self-Play Training                   ║
+║              Fénix Chess — Self-Play Training                   ║
 ║                                                                     ║
 ║  Train a deep reinforcement learning agent to play chess at a       ║
 ║  superhuman level using self-play + MCTS, inspired by DeepMind's   ║
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="AlphaZero Chess — self-play training with MCTS",
+        description="Fénix Chess — self-play training with MCTS",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
@@ -93,7 +93,7 @@ def main():
     setup_logging()
     save_training_config()
 
-    logger.info("Starting AlphaZero Chess Training")
+    logger.info("Starting Fénix Chess Training")
     logger.info("=" * 60)
 
     # ── Device detection ───────────────────────────────────────────────

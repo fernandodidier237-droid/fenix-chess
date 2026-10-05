@@ -1,7 +1,7 @@
 #!/home/didier/alpha_zero_chess_selfplay/.venv/bin/python
 """
 ╔══════════════════════════════════════════════════════════════════════════╗
-║         AlphaZero Chess — UCI Engine Interface (v2, híbrido)             ║
+║         Fénix Chess — UCI Engine Interface (v2, híbrido)             ║
 ║                                                                          ║
 ║  Dos modos de búsqueda (opción UCI "SearchType"):                        ║
 ║    Hybrid (defecto): alfa-beta + quiescencia + TT, con la red            ║
@@ -57,7 +57,7 @@ def _load_model(checkpoint_path: str, device: str = "cpu"):
     return model
 
 
-class AlphaZeroUCIEngine:
+class FenixUCIEngine:
     """Motor UCI: híbrido alfa-beta + red neuronal, o MCTS + red."""
 
     def __init__(self, checkpoint_path: str, mcts_sims: int = 400,
@@ -75,8 +75,8 @@ class AlphaZeroUCIEngine:
         self._loaded = False
         self._load_failed = False
 
-        self.name = "AlphaZeroChess-Hybrid"
-        self.author = "AlphaZero Chess Project"
+        self.name = "FenixChess-Hybrid"
+        self.author = "Fénix Chess Project"
 
         # estado de búsqueda
         self._search_thread: Optional[threading.Thread] = None
@@ -467,7 +467,7 @@ def _format_score(score: int) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="AlphaZero Chess — UCI Engine",
+        description="Fénix Chess — UCI Engine",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--checkpoint", "-m",
@@ -485,7 +485,7 @@ def main():
                         help="Tamaño de la tabla transpositoria (MB)")
     args = parser.parse_args()
 
-    engine = AlphaZeroUCIEngine(
+    engine = FenixUCIEngine(
         checkpoint_path=args.checkpoint,
         mcts_sims=args.sims,
         device=args.device,

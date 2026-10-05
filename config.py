@@ -1,5 +1,5 @@
 """
-Configuration parameters for AlphaZero Chess AI.
+Configuration parameters for Fénix Chess AI.
 All tunable hyperparameters are centralized here.
 """
 

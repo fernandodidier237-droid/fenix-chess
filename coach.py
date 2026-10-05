@@ -1,5 +1,5 @@
 """
-AlphaZero Coach — orchestrates the full training pipeline.
+Fénix Coach — orchestrates the full training pipeline.
 
 Pipeline per iteration:
   1. Self-play: generate training examples using current model + MCTS
@@ -252,9 +252,9 @@ class Coach:
     # ── Main loop ───────────────────────────────────────────────────────
 
     def train(self):
-        """Run the full AlphaZero training loop."""
+        """Run the full Fénix training loop."""
         logger.info("=" * 60)
-        logger.info("Starting AlphaZero Chess training")
+        logger.info("Starting Fénix Chess training")
         logger.info("Iterations=%d, Self-play games=%d, MCTS sims=%d",
                      self.num_iterations, self.num_self_play_games, self.mcts_sims)
         logger.info("Neural network: %d res-blocks, %d filters",

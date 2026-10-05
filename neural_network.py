@@ -1,5 +1,5 @@
 """
-Neural network architecture for AlphaZero Chess.
+Neural network architecture for Fénix Chess.
 
 Architecture (following the AlphaZero paper):
   - Input: 8×8×119 (board encoding)
@@ -45,7 +45,7 @@ class ResidualBlock(nn.Module):
 
 class NeuralNetwork(nn.Module):
     """
-    AlphaZero neural network: maps board → (policy_logits, value).
+    Fénix neural network: maps board → (policy_logits, value).
     """
 
     def __init__(

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════════════════╗
-║       AlphaZero Chess — Web GUI                                         ║
+║       Fénix Chess — Web GUI                                         ║
 ║                                                                         ║
-║  Interfaz web para jugar al ajedrez contra AlphaZero o Stockfish.       ║
+║  Interfaz web para jugar al ajedrez contra Fénix o Stockfish.       ║
 ║                                                                         ║
 ║  Usage:                                                                 ║
 ║    python chess_gui.py                                                  ║
@@ -29,7 +29,7 @@ import chess_env
 # ── Import chess engines ────────────────────────────────────────────────
 from stockfish_integration import StockfishEvaluator, find_stockfish
 
-# ── Estimated ELO for the untrained AlphaZero model ─────────────────────
+# ── Estimated ELO for the untrained Fénix model ─────────────────────
 # The model was trained for only 1 iteration with 5 self-play games.
 # This is essentially a random network. Estimated ELO: ~500 (novice).
 # As training progresses, this can reach 2000+.
@@ -55,7 +55,7 @@ sf_engine = None
 
 
 def load_alpha_zero(checkpoint_path: str, device: str = "cpu"):
-    """Load the trained AlphaZero model."""
+    """Load the trained Fénix model."""
     import torch
     from neural_network import NeuralNetwork
     model = NeuralNetwork(
@@ -71,7 +71,7 @@ def load_alpha_zero(checkpoint_path: str, device: str = "cpu"):
 
 
 def alpha_zero_move(model, board_fen: str, mcts_sims: int = 200) -> dict:
-    """Get the best move from AlphaZero using MCTS."""
+    """Get the best move from Fénix using MCTS."""
     from mcts import MCTS
     board = chess.Board(board_fen)
     
@@ -144,15 +144,15 @@ async def lifespan(app: FastAPI):
     """Load models on startup."""
     global az_model, sf_engine
     
-    # Load AlphaZero
+    # Load Fénix
     if os.path.exists(checkpoint_path):
-        logger.info(f"Loading AlphaZero model from {checkpoint_path}...")
+        logger.info(f"Loading Fénix model from {checkpoint_path}...")
         try:
             az_model = load_alpha_zero(checkpoint_path, az_device)
             params = sum(p.numel() for p in az_model.parameters())
-            logger.info(f"  AlphaZero loaded: {params:,} params on {az_device}")
+            logger.info(f"  Fénix loaded: {params:,} params on {az_device}")
         except Exception as e:
-            logger.error(f"  Failed to load AlphaZero model: {e}")
+            logger.error(f"  Failed to load Fénix model: {e}")
     else:
         logger.warning(f"  Checkpoint not found at {checkpoint_path}")
         logger.warning("  Train the model first or use --checkpoint")
@@ -167,7 +167,7 @@ async def lifespan(app: FastAPI):
             pass
 
 
-app = FastAPI(title="AlphaZero Chess GUI", lifespan=lifespan)
+app = FastAPI(title="Fénix Chess GUI", lifespan=lifespan)
 
 
 # ── API endpoints ───────────────────────────────────────────────────────
@@ -213,7 +213,7 @@ async def api_move(request: Request):
         result = stockfish_move(fen)
     else:
         if az_model is None:
-            return {"move": None, "error": "AlphaZero model no cargado. Entrena el modelo primero con: python main.py --iterations 1 --self-play-games 5"}
+            return {"move": None, "error": "Fénix model no cargado. Entrena el modelo primero con: python main.py --iterations 1 --self-play-games 5"}
         result = alpha_zero_move(az_model, fen, mcts_sims=sims)
     
     return result
@@ -232,7 +232,7 @@ HTML_PAGE = r"""
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AlphaZero Chess</title>
+<title>Fénix Chess</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
 <style>
   :root {
@@ -478,7 +478,7 @@ HTML_PAGE = r"""
 </head>
 <body>
 
-<h1>♚ AlphaZero Chess</h1>
+<h1>♚ Fénix Chess</h1>
 <p class="subtitle">Juega contra la IA o contra Stockfish</p>
 
 <div class="container">
@@ -492,7 +492,7 @@ HTML_PAGE = r"""
     <div class="control-group">
       <label>Jugar contra</label>
       <select id="opponent-select">
-        <option value="alpha-zero">🧠 AlphaZero (~500 ELO - novato)</option>
+        <option value="alpha-zero">🧠 Fénix (~500 ELO - novato)</option>
         <option value="stockfish">🤖 Stockfish (ELO 2800)</option>
       </select>
     </div>
@@ -506,7 +506,7 @@ HTML_PAGE = r"""
     </div>
 
     <div class="control-group">
-      <label>Fuerza AlphaZero (simulaciones MCTS)</label>
+      <label>Fuerza Fénix (simulaciones MCTS)</label>
       <select id="sims-select">
         <option value="25">⚡ Muy rápido (25 sims - CPU)</option>
         <option value="50">⚡ Rápido (50 sims)</option>
@@ -525,7 +525,7 @@ HTML_PAGE = r"""
     </div>
 
     <div id="top-moves-panel" class="top-moves">
-      <div class="title">AlphaZero evalúa:</div>
+      <div class="title">Fénix evalúa:</div>
       <div id="top-moves-list"></div>
     </div>
 
@@ -647,7 +647,7 @@ async function makeAIMove() {
       if (data.elo) statusText += ` · ELO ${data.elo}`;
       setStatus(statusText, 'idle');
 
-      // Show top moves from AlphaZero analysis
+      // Show top moves from Fénix analysis
       if (data.top_moves && data.top_moves.length > 0) {
         const panel = document.getElementById('top-moves-panel');
         const list = document.getElementById('top-moves-list');
@@ -806,7 +806,7 @@ window.onload = function() {
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(
-        description="AlphaZero Chess Web GUI",
+        description="Fénix Chess Web GUI",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--checkpoint", default=checkpoint_path,
@@ -816,7 +816,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8765,
                         help="Server port")
     parser.add_argument("--device", default="cpu",
-                        help="Device for AlphaZero inference")
+                        help="Device for Fénix inference")
     parser.add_argument("--host", default="0.0.0.0",
                         help="Host to bind to")
     args = parser.parse_args()
@@ -826,12 +826,12 @@ if __name__ == "__main__":
 
     print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
-║              AlphaZero Chess — Web GUI                          ║
+║              Fénix Chess — Web GUI                          ║
 ║                                                                 ║
 ║  Abre en tu navegador:                                          ║
 ║    →  http://localhost:{args.port}                               ║
 ║                                                                 ║
-║  Juega contra AlphaZero o Stockfish desde el navegador.         ║
+║  Juega contra Fénix o Stockfish desde el navegador.         ║
 ╚══════════════════════════════════════════════════════════════════╝
     """)
 

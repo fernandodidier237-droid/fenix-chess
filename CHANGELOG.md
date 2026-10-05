@@ -1,7 +1,57 @@
-# Changelog — AlphaZero Chess
+# Changelog — Fénix Chess
 
 Historial de iteraciones del motor, en orden real de desarrollo.
 Versión en español · [English](CHANGELOG.en.md)
+
+> **Nota de nombre**: a partir de la 1.7 el motor se llama **Fénix Chess**
+> (`FenixChess-Hybrid` en UCI, entradas `FenixChess` y `FenixChess-MCTS` en
+> PyChess). El proyecto se rebautiza porque «AlphaZero» ya es una marca de
+> DeepMind. El motor no es una implementación de AlphaZero: es un buscador
+> alfa-beta clásico con priors de una red propia, inspirado en la idea de
+> autojuego + red + búsqueda.
+
+## 1.7 — null-move verificado + LMR más agresivo
+
+Cambio pequeño en `search.py` (+21 / −2 líneas) y ninguna opción UCI nueva.
+
+- **Null-move pruning** desde `depth >= 5`, con reducción 3 y verificación
+  (`_can_null_move`, estático): no se aplica en jaque, en posiciones
+  susceptibles de zugzwang, ni en nodos de mate.
+- **LMR más agresivo**: umbral `i >= 3` y reducción 2 en `i >= 6` (antes
+  `i >= 6` y reducción 1).
+
+### Escalera medida contra Stockfish 16 (4 partidas/nivel, 1 s nuestra jugada)
+
+| Nivel | v1.5 | v1.6 | **v1.7** |
+|---|---|---|---|
+| `UCI_Elo 1350` | 6-0-0 | 4-0-0 | **3-0-1 (+3,0/4)** |
+| `UCI_Elo 1600` | 3-1-0 (+2,0/4) | 3-1-0 (+2,0/4) | **3-0-1 (+2,0/4)** |
+| `UCI_Elo 1800` | 0-1-3 (−3/4) | 2-0-2 (0,0/4) | **2-0-2 (0,0/4)** |
+| Fuerza completa (0,5 s) | 0-0-1 | 0-0-2 | **0-0-2** |
+
+### A/B directo v1.6 vs v1.7 (8 partidas, 1 s por jugada, colores alternados)
+
+**4,0/8 – 4,0/8: empate.** El resultado alterna exactamente con el color
+(gana el que juega de negras), es decir, la diferencia de fuerza entre 1.6 y 1.7
+es indistinguible del ruido. Por eso sale como **1.7** y no como 2.0: mismo
+criterio que la 1.6, sin salto demostrable de fuerza.
+
+### Eficiencia (nodos a profundidad fija)
+
+| Medición | v1.6 | v1.7 | Δ |
+|---|---|---|---|
+| Nodos, prof. 7 (4 posiciones) | 239.527 | 238.566 | **−0,4 %** |
+| Nodos, prof. 7 (startpos) | 212.706 | 220.882 | +3,8 % |
+| Nodos, prof. 8 (startpos) | 366.285 | 450.152 | +22,9 % |
+| Tiempo hasta prof. 8 (startpos) | 4,16 s | 4,34 s | +4,4 % |
+| Nodos/s | ~27 k | ~27 k | 0 % |
+
+Conclusión honesta: **la 1.7 no es más eficiente que la 1.6**; lo único que
+aporta frente a ella es la escalera a 1800 (0,0/4 frente a −3/4 de la 1.5).
+Ablaciones implementadas, medidas y descartadas: más movilidad (−12 % nodos,
+pero pierde un ply: `d6` en vez de `d7`), ordenar por la PV después de la
+tabla (+12 % nodos), null-move solo (+5 % a prof. 7, −29 % de tiempo hasta
+prof. 8) y LMR solo (−6 % nodos).
 
 ## 1.0 — Motor original (estado inicial)
 
@@ -98,13 +148,13 @@ red entrenada poco; aquí no hay truco posible.
 
 - `alpha_zero_engine.py` ejecutable con shebang del venv
   (`#!/home/didier/.../.venv/bin/python`) → PyChess lo lanza directamente.
-- Entrada `AlphaZeroChess` en `~/.config/pychess/engines.json`
+- Entrada `FenixChess` en `~/.config/pychess/engines.json`
   (backup en `engines.json.bak-alphazero`): protocolo UCI, variant
   `normal`, nivel 20, opciones del motor.
 - `verify_pychess_integration.py`: verificación con el **código real de
   PyChess** (EngineDiscoverer):
   - descubrimiento: PyChess lanza el motor, parsea el handshake `uci`
-    (`AlphaZeroChess` descubierto, 0 fallos, md5 rellenado);
+    (`FenixChess` descubierto, 0 fallos, md5 rellenado);
   - partida real: `initEngine` + `UCIEngine.makeMove` devuelve jugadas
     (`g1f3`, `g8f6`) con `go wtime ...`.
 - GUI: PyChess arranca en DISPLAY=:0 con la entrada registrada.
@@ -122,9 +172,9 @@ Corregido en la iteración:
 
 1. **Diálogo «Nueva partida»** → desplegable de motor: aparecen **dos**
    entradas registradas:
-   - `AlphaZeroChess` → modo **Hybrid** (alfa-beta + priors de la red): el
+   - `FenixChess` → modo **Hybrid** (alfa-beta + priors de la red): el
      más fuerte, es el defecto;
-   - `AlphaZeroChess-MCTS` → modo **MCTS** puro (el AlphaZero clásico).
+   - `FenixChess-MCTS` → modo **MCTS** puro (el AlphaZero clásico).
 2. **Herramientas → Motores** → seleccionar la entrada → tabla de opciones
    **editable** (`SearchType`, `UseNN`, `MCTS_Simulations`, `Hash`). Al
    cerrar el diálogo, PyChess guarda en `engines.json` y lo aplica al
@@ -135,7 +185,7 @@ Corregido en la iteración:
    ficheros (p. ej. desde el backup) y luego re-ejecutar la verificación.
 
 Cambios:
-- Entrada `AlphaZeroChess-MCTS` clonada en `~/.config/pychess/engines.json`
+- Entrada `FenixChess-MCTS` clonada en `~/.config/pychess/engines.json`
   (backup previo: `engines.json.bak-iteraciones`) con
   `options[SearchType].value = "MCTS"`; la entrada original queda con
   `value = "Hybrid"`. El `value` es exactamente lo que PyChess escribe al
@@ -162,7 +212,7 @@ p. ej. editar `alpha_zero_engine.py` → md5 distinto), regenera la lista de
 opciones y **pierde los `value`**; hay que volver a ponerlos (editar en
 Herramientas → Motores, o re-ejecutar `verify_pychess_integration.py`).
 Además ambas entradas comparten md5 (mismo fichero), así que «recordar el
-último motor» puede precargar `AlphaZeroChess` en lugar de la variante MCTS.
+último motor» puede precargar `FenixChess` en lugar de la variante MCTS.
 
 ## 1.6 — Evaluación: refugio del rey (y dos klasikuer descartados)
 

@@ -3,11 +3,11 @@
 Verificación headless de la integración con PyChess (con el código REAL de
 PyChess, sin GUI), para las DOS entradas registradas:
 
-    AlphaZeroChess       -> SearchType = Hybrid
-    AlphaZeroChess-MCTS  -> SearchType = MCTS
+    FenixChess       -> SearchType = Hybrid
+    FenixChess-MCTS  -> SearchType = MCTS
 
 Pasos:
-  1. Fuerza un re-check de las entradas AlphaZero (como en su 1ª instalación).
+  1. Fuerza un re-check de las entradas Fénix (como en su 1ª instalación).
   2. Descubrimiento: PyChess lanza el motor y parsea su respuesta 'uci'.
   3. Inyecta el valor de SearchType en engines.json (exactamente lo que hace
      el diálogo "Motores" de PyChess al editar una opción) y lo refleja en la
@@ -35,10 +35,10 @@ TIMEOUT = 60
 
 # Entrada esperada -> valor de la opción SearchType
 EXPECTED = {
-    "AlphaZeroChess": "Hybrid",
-    "AlphaZeroChess-MCTS": "MCTS",
+    "FenixChess": "Hybrid",
+    "FenixChess-MCTS": "MCTS",
 }
-NEW_ENTRY_NAME = "AlphaZeroChess-MCTS"
+NEW_ENTRY_NAME = "FenixChess-MCTS"
 
 
 def load_engines():
@@ -53,14 +53,14 @@ def save_engines(engines):
 
 def ensure_entries(engines):
     """Crea la entrada MCTS (clon de la principal) si no existe todavía."""
-    base = next((e for e in engines if e.get("name") == "AlphaZeroChess"), None)
+    base = next((e for e in engines if e.get("name") == "FenixChess"), None)
     if base is None:
-        raise SystemExit("FALLO: no existe la entrada AlphaZeroChess")
+        raise SystemExit("FALLO: no existe la entrada FenixChess")
     if not any(e.get("name") == NEW_ENTRY_NAME for e in engines):
         clone = json.loads(json.dumps(base))  # copia profunda
         clone["name"] = NEW_ENTRY_NAME
         clone["comment"] = (
-            "AlphaZero: búsqueda MCTS puro (misma red neuronal)"
+            "Fénix: búsqueda MCTS puro (misma red neuronal)"
         )
         clone["recheck"] = True
         engines.append(clone)
@@ -68,7 +68,7 @@ def ensure_entries(engines):
 
 
 def force_recheck(engines):
-    """Re-check de las entradas AlphaZero, como en su primera instalación."""
+    """Re-check de las entradas Fénix, como en su primera instalación."""
     for e in engines:
         if e.get("name") in EXPECTED:
             e["recheck"] = True

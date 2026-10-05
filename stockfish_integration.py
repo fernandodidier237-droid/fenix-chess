@@ -1,5 +1,5 @@
 """
-Stockfish UCI integration for AlphaZero Chess.
+Stockfish UCI integration for Fénix Chess.
 
 Provides:
   - Automated discovery of Stockfish binary

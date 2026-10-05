@@ -1,5 +1,5 @@
 """
-Utility functions for AlphaZero Chess.
+Utility functions for Fénix Chess.
 
 Includes:
   - Logging configuration

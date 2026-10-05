@@ -1,5 +1,5 @@
 """
-Monte Carlo Tree Search (MCTS) for AlphaZero Chess.
+Monte Carlo Tree Search (MCTS) for Fénix Chess.
 
 Implements the search described in the AlphaZero paper:
   - Node selection via PUCT
