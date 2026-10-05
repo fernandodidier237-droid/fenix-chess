@@ -11,6 +11,11 @@
 
 **English** | [Español](README.es.md)
 
+![AlphaZero (Hybrid) checkmating Stockfish 16 limited to 1350 Elo](docs/demo.gif)
+
+*Real game recorded by `play_match.py`: AlphaZero (Hybrid, 1 s/move) vs
+Stockfish 16 at `UCI_Elo 1350` — checkmate in 65 moves, no editing.*
+
 ## TL;DR
 
 ```bash

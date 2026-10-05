@@ -12,6 +12,11 @@
 
 [English](README.md) | **Español**
 
+![AlphaZero (Hybrid) da mate a Stockfish 16 limitado a 1350 Elo](docs/demo.gif)
+
+*Partida real registrada por `play_match.py`: AlphaZero (Hybrid, 1 s/jugada)
+contra Stockfish 16 con `UCI_Elo 1350` — mate en 65 jugadas, sin editar.*
+
 ## Resumen
 
 ```bash
