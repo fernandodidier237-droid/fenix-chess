@@ -11,8 +11,6 @@
 
 **English** | [Español](README.es.md)
 
-![AlphaZero playing inside PyChess](docs/pychess.png)
-
 ## TL;DR
 
 ```bash

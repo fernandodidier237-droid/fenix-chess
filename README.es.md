@@ -12,8 +12,6 @@
 
 [English](README.md) | **Español**
 
-![AlphaZero jugando dentro de PyChess](docs/pychess.png)
-
 ## Resumen
 
 ```bash
